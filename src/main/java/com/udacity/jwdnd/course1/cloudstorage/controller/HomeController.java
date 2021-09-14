@@ -65,9 +65,9 @@ public class HomeController {
         List<Credential> creds = credentialService.getCredentialsByUser(u);
         model.addAttribute("credentials", creds);
 
-        model.addAttribute("newCredential", new Credential(null, null, null, null, null, null));
-        model.addAttribute("newFile", new File(null, null, null, null, null, null));
-        model.addAttribute("newNote", new Note(null, null, null, null));
+        model.addAttribute("credential", new Credential(null, null, null, null, null, null));
+        model.addAttribute("file", new File(null, null, null, null, null, null));
+        model.addAttribute("note", new Note(null, null, null, null));
         return "home";
     }
 }
