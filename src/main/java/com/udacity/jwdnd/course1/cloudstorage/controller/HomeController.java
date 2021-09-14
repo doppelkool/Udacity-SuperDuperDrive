@@ -13,8 +13,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @Controller
 @RequestMapping("/home")
 public class HomeController {
@@ -30,44 +28,64 @@ public class HomeController {
         this.credentialService = credentialService;
     }
 
-    @RequestMapping()
-    public String getHome(@ModelAttribute @RequestParam(name = "noteid",required = false) String noteid,
-                          @ModelAttribute @RequestParam(name = "fileid", required = false) String fileid,
-                          @ModelAttribute @RequestParam(name = "credentialId", required = false) String credentialId,
-                          Authentication authentication,
-                          Model model) {
-        User user = userService.getUserByUsername(authentication.getName());
-        if(noteid != null)
-        {
-            noteService.createNote(new Note(null, (String)model.getAttribute("notetitle"), (String)model.getAttribute("notedescription"), user.getUserid()));
-            System.out.println("WasSet: " + noteid);
-        }
+    //@RequestMapping()
+    //public String getHome(@ModelAttribute @RequestParam(name = "noteid",required = false) String noteid,
+    //                      @ModelAttribute @RequestParam(name = "fileId", required = false) String fileId,
+    //                      @ModelAttribute @RequestParam(name = "credentialid", required = false) String credentialId,
+    //                      Authentication authentication,
+    //                      Model model) {
+    //    User user = userService.getUserByUsername(authentication.getName());
+    //    if(noteid != null)
+    //    {
+    //        noteService.createNote(new Note(null, (String)model.getAttribute("notetitle"), (String)model.getAttribute("notedescription"), user.getUserid()));
+    //        System.out.println("WasSet: " + noteid);
+    //    }
+//
+    //    if(credentialId != null)
+    //    {
+    //        credentialService.createCredential(new Credential(null, (String)model.getAttribute("url"), (String)model.getAttribute("username"), "key", (String)model.getAttribute("password"), user.getUserid()));
+    //        System.out.println("WasSet: " + credentialId);
+    //    }
+//
+    //    if(fileId != null)
+    //    {
+    //        fileService.createFile(new File(null, (String)"", (String)"", "", user.getUserid(), new byte[1]));
+    //        System.out.println("WasSet: " + fileId);
+    //    }
+//
+    //    User u = userService.getUserByUsername(authentication.getName());
+    //    List<Note> notes = noteService.getNotesByUser(u);
+    //    model.addAttribute("notes", notes);
+//
+    //    List<File> files = fileService.getFilesByUser(u);
+    //    model.addAttribute("files", files);
+//
+    //    List<Credential> creds = credentialService.getCredentialsByUser(u);
+    //    model.addAttribute("credentials", creds);
+//
+    //    return "home";
+    //}
 
-        if(credentialId != null)
-        {
-            credentialService.createCredential(new Credential(null, (String)model.getAttribute("url"), (String)model.getAttribute("username"), "key", (String)model.getAttribute("password"), user.getUserid()));
-            System.out.println("WasSet: " + credentialId);
-        }
-
-        if(fileid != null)
-        {
-            fileService.createFile(new File(null, (String)"", (String)"", "", user.getUserid(), new byte[1]));
-            System.out.println("WasSet: " + fileid);
-        }
-
+    @GetMapping
+    public String getHome(Authentication authentication, Model model) {
         User u = userService.getUserByUsername(authentication.getName());
-        List<Note> notes = noteService.getNotesByUser(u);
-        model.addAttribute("notes", notes);
 
-        List<File> files = fileService.getFilesByUser(u);
-        model.addAttribute("files", files);
-
-        List<Credential> creds = credentialService.getCredentialsByUser(u);
-        model.addAttribute("credentials", creds);
+        model.addAttribute("notes", noteService.getNotesByUser(u));
+        model.addAttribute("files", fileService.getFilesByUser(u));
+        model.addAttribute("credentials", credentialService.getCredentialsByUser(u));
 
         model.addAttribute("credential", new Credential(null, null, null, null, null, null));
         model.addAttribute("file", new File(null, null, null, null, null, null));
         model.addAttribute("note", new Note(null, null, null, null));
+
+        System.out.println("HomeController: Get");
         return "home";
+    }
+
+    @PostMapping
+    public String getHome(Model model, Authentication authentication) {
+
+        System.out.println("HomeController: Post");
+        return getHome(authentication, model);
     }
 }
