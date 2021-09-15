@@ -11,15 +11,15 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
-@RequestMapping("/note")
-public class NoteController {
+@RequestMapping("/file")
+public class FileController {
     private final FileService fileService;
     private final UserService userService;
     private final NoteService noteService;
     private final CredentialService credentialService;
     private final EncryptionService encryptionService;
 
-    public NoteController(UserService userService, NoteService noteService, FileService fileService, CredentialService credentialService, EncryptionService encryptionService) {
+    public FileController(UserService userService, NoteService noteService, FileService fileService, CredentialService credentialService, EncryptionService encryptionService) {
         this.userService = userService;
         this.noteService = noteService;
         this.fileService = fileService;
@@ -41,19 +41,18 @@ public class NoteController {
 
         model.addAttribute("encryptionService",encryptionService);
 
-        System.out.println("NoteController: Get");
+        System.out.println("FileController: Get");
         return "home";
     }
 
     @PostMapping
-    public String getHome(@ModelAttribute("note") Note note,
+    public String getHome(@ModelAttribute("file") File file,
                           Model model,
                           Authentication authentication) {
 
-        Integer uid = userService.getUserByUsername(authentication.getName()).getUserid();
-        noteService.createNote(new Note(null, note.getNotetitle(), note.getNotedescription(), uid));
+        fileService.createFile(new File(null, file.getFilename(), file.getContenttype(), file.getFilesize(), file.getUserid(), file.getFiledata()));
 
-        System.out.println("NoteController: Post");
+        System.out.println("FileController: Post");
         return getHome(authentication, model);
     }
 }

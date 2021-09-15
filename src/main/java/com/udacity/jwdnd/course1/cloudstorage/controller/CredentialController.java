@@ -8,18 +8,24 @@ import com.udacity.jwdnd.course1.cloudstorage.services.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import java.security.SecureRandom;
+import java.util.Base64;
 
 @Controller
-@RequestMapping("/note")
-public class NoteController {
+@RequestMapping("/cred")
+public class CredentialController {
     private final FileService fileService;
     private final UserService userService;
     private final NoteService noteService;
     private final CredentialService credentialService;
     private final EncryptionService encryptionService;
 
-    public NoteController(UserService userService, NoteService noteService, FileService fileService, CredentialService credentialService, EncryptionService encryptionService) {
+    public CredentialController(UserService userService, NoteService noteService, FileService fileService, CredentialService credentialService, EncryptionService encryptionService) {
         this.userService = userService;
         this.noteService = noteService;
         this.fileService = fileService;
@@ -41,19 +47,19 @@ public class NoteController {
 
         model.addAttribute("encryptionService",encryptionService);
 
-        System.out.println("NoteController: Get");
+        System.out.println("CredentialController: Get");
         return "home";
     }
 
     @PostMapping
-    public String getHome(@ModelAttribute("note") Note note,
+    public String getHome(@ModelAttribute("credential") Credential credential,
                           Model model,
                           Authentication authentication) {
 
         Integer uid = userService.getUserByUsername(authentication.getName()).getUserid();
-        noteService.createNote(new Note(null, note.getNotetitle(), note.getNotedescription(), uid));
+        credentialService.createCredential(new Credential(null, credential.getUrl(), credential.getUsername(), "salt", credential.getPassword(), uid));
 
-        System.out.println("NoteController: Post");
+        System.out.println("CredentialController: Post");
         return getHome(authentication, model);
     }
 }
