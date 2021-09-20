@@ -16,7 +16,7 @@
 
     <h1 class="display-5">Sign Up</h1>
     <form action="#" th:action="@{/signup}" method="POST">
-        <div class="alert alert-danger" th:if="${signupError}">
+        <div class="alert alert-danger" id="signUpError" th:if="${signupError}">
             <span th:text="${signupError}"></span>
         </div>
         <div class="form-row">

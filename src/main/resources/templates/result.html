@@ -13,7 +13,7 @@
     <div class="alert alert-success fill-parent" th:if="${successNote}">
         <h1 class="display-5">Success</h1>
         <span th:text="${successNote} + ' Click '"></span>
-        <a class="home-url" th:href="@{/home}" th:text="' here '"></a>
+        <a class="home-url" id="home-url" th:href="@{/home}" th:text="' here '"></a>
         <span>to continue.</span>
     </div>
 

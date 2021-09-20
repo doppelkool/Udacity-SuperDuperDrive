@@ -3,6 +3,7 @@ package com.udacity.jwdnd.course1.cloudstorage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -17,7 +18,15 @@ public class LoginPage {
     @FindBy(id = "login-submit-button")
     private WebElement loginButton;
 
-    public void toLogin(WebDriver driver, int port, WebDriverWait wait)
+    @FindBy(id = "invalidLoginData")
+    private WebElement invalidLoginData;
+
+    public LoginPage(WebDriver driver)
+    {
+        PageFactory.initElements(driver, this);
+    }
+
+    public void toLogin(int port, WebDriver driver, WebDriverWait wait)
     {
         driver.get("http://localhost:" + port + "/login");
 
@@ -29,10 +38,10 @@ public class LoginPage {
 
     public void login(String username, String password)
     {
-        getLoginUsername().sendKeys(username);
-        getLoginPassword().sendKeys(password);
+        loginUsername.sendKeys(username);
+        loginPassword.sendKeys(password);
 
-        getLoginButton().click();
+        loginButton.click();
     }
 
 
@@ -46,5 +55,10 @@ public class LoginPage {
 
     public WebElement getLoginButton() {
         return loginButton;
+    }
+
+    public WebElement getInvalidLoginData()
+    {
+        return invalidLoginData;
     }
 }

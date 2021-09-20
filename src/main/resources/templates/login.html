@@ -14,7 +14,7 @@
         <div class="alert alert-success" th:if="${signupSuccess}">
             You've successfully signed up!
         </div>
-        <div class="alert alert-danger" th:if="${param.error}">
+        <div class="alert alert-danger" id="invalidLoginData" th:if="${param.error}">
             Invalid username or password
         </div>
         <div class="alert alert-dark" th:if="${param.logout}">

@@ -1,7 +1,7 @@
 package com.udacity.jwdnd.course1.cloudstorage;
 
-import com.udacity.jwdnd.course1.cloudstorage.CustomTest.Order;
-import com.udacity.jwdnd.course1.cloudstorage.CustomTest.OrderedRunner;
+import com.udacity.jwdnd.course1.cloudstorage.services.CredentialService;
+import com.udacity.jwdnd.course1.cloudstorage.services.EncryptionService;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.junit.jupiter.api.*;
 import org.junit.runner.RunWith;
@@ -9,12 +9,15 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 
+import java.util.Random;
+
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@RunWith(OrderedRunner.class)
 class CloudStorageApplicationTests {
 
 	@LocalServerPort
@@ -26,6 +29,10 @@ class CloudStorageApplicationTests {
 	SignUpPage signUpPage;
 	LoginPage loginPage;
 	HomePage homePage;
+	ResultPage resultPage;
+
+	@Autowired
+	private EncryptionService encryptionService;
 
 	@BeforeAll
 	static void beforeAll() {
@@ -35,6 +42,7 @@ class CloudStorageApplicationTests {
 	@BeforeEach
 	public void beforeEach() {
 		this.driver = new ChromeDriver();
+		wait = new WebDriverWait(driver, 10);
 	}
 
 	@AfterEach
@@ -45,14 +53,12 @@ class CloudStorageApplicationTests {
 	}
 
 	@Test
-	@Order(order = 1)
 	public void getLoginPage() {
 		driver.get("http://localhost:" + this.port + "/login");
 		Assertions.assertEquals("Login", driver.getTitle());
 	}
 
 	@Test
-	@Order(order = 2)
 	public void unauthorized()
 	{
 		//Assert: Not logged in
@@ -63,156 +69,223 @@ class CloudStorageApplicationTests {
 		Assertions.assertEquals("Login", driver.getTitle());
 
 		driver.get("http://localhost:" + this.port + "/signup");
-		Assertions.assertEquals("SignUp", driver.getTitle());
+		Assertions.assertEquals("Sign Up", driver.getTitle());
 	}
 
 	@Test
-	@Order(order = 3)
 	public void notExistingUser()
 	{
 		String username = "notExistingUser";
 		String password = "anyPass";
 
-		loginPage = new LoginPage();
-		loginPage.toLogin(driver, this.port, wait);
+		loginPage = new LoginPage(driver);
+		loginPage.toLogin(this.port, driver, wait);
 
 		Assertions.assertEquals("Login", driver.getTitle());
 
 		loginPage.login(username, password);
 
-		WebElement loginFailedAlert = driver.findElement(By.className("alert alert-danger"));
-		Assertions.assertTrue(loginFailedAlert.isDisplayed());
+		Assertions.assertTrue(driver.getCurrentUrl().contains("error"));
 	}
 
 	@Test
-	@Order(order = 4)
 	public void SignUpLoginTest()
 	{
 		String firstname = "test";
 		String lastname = "user";
 
-		String username = "Test.User";
+		String username = "Test.User" + new Random().nextInt(1000);
 		String password = "testpass";
 
-		driver.get("http://localhost:" + this.port + "/signup");
-		signUpPage = new SignUpPage();
+		signUpPage = new SignUpPage(driver);
+		signUpPage.toSignUp(port, driver, wait);
 		signUpPage.signUp(firstname, lastname, username, password);
 
-		driver.get("http://localhost:" + this.port + "/login");
-		loginPage = new LoginPage();
-		loginPage.getLoginUsername().sendKeys(username);
-		loginPage.getLoginPassword().sendKeys(password);
-		loginPage.getLoginButton().click();
+		loginPage = new LoginPage(driver);
+		loginPage.toLogin(port, driver, wait);
+		loginPage.login(username, password);
 		Assertions.assertEquals("Home", driver.getTitle());
-
+		System.out.println("Username: " + username);
+		System.out.println("Passwort: " + password);
 	}
 
 	@Test
-	@Order(order = 5)
 	public void logoutTest()
 	{
-		homePage = new HomePage();
+		String username = "Test.User585";
+		String password = "testpass";
+
+		loginPage = new LoginPage(driver);
+		loginPage.toLogin(port, driver, wait);
+		loginPage.login(username, password);
+		Assertions.assertEquals("Home", driver.getTitle());
+
+		homePage = new HomePage(driver);
+		wait.until(ExpectedConditions.elementToBeClickable(homePage.getLogoutButton()));
 		homePage.getLogoutButton().click();
 		Assertions.assertEquals("Login", driver.getTitle());
 
 		driver.get("http://localhost:" + this.port + "/home");
-		Assertions.assertEquals("Login", driver.getTitle());
+		Assertions.assertNotEquals("Home", driver.getTitle());
 	}
 
 	@Test
-	@Order(order = 6)
 	public void signUpAlreadyExistingUser()
 	{
-		String firstname = "test";
-		String lastname = "user";
+		String firstname = "Testname";
+		String lastname = "TestLastname";
 
-		String username = "Test.User";
+		String username = "Test.User585";
 		String password = "testpass";
 
-		driver.get("http://localhost:" + this.port + "/signup");
-		signUpPage = new SignUpPage();
+		signUpPage = new SignUpPage(driver);
+		signUpPage.toSignUp(port, driver, wait);
 		signUpPage.signUp(firstname, lastname, username, password);
 
-		WebElement signUpError = driver.findElement(By.className("alert alert-danger"));
+		WebElement signUpError = driver.findElement(By.id("signUpError"));
 		Assertions.assertTrue(signUpError.isDisplayed());
 	}
 
 	@Test
-	@Order(order = 7)
-	public void createNoteTest()
-	{
-		String username = "Test.User";
+	public void createNoteTest() throws InterruptedException {
+		String username = "Test.User585";
 		String password = "testpass";
 
-		String noteTitle = "newNoteTitleTest";
-		String noteDesc = "newNoteDescTest";
+		String noteTitle = "newTitle";
+		String noteDesc = "newDescr";
 
-		driver.get("http://localhost:" + this.port + "/login");
-		loginPage = new LoginPage();
+		loginPage = new LoginPage(driver);
+		loginPage.toLogin(port, driver, wait);
 		loginPage.login(username, password);
 
-		homePage = new HomePage();
-		homePage.createNote(noteTitle, noteDesc);
+		homePage = new HomePage(driver);
+		homePage.toHome(driver);
+		homePage.navNotesTab(driver);
+		homePage.navNewNote(driver);
+		homePage.createNote(driver, noteTitle, noteDesc);
 
 		Assertions.assertTrue(driver.getCurrentUrl().contains("add-note-result"));
-
 		Assertions.assertEquals("Result", driver.getTitle());
-		Assertions.assertEquals(noteTitle, homePage.getNoteTitleDisplay().getText());
-		Assertions.assertEquals(noteDesc, homePage.getNoteDescriptionDisplay().getText());
+
+		resultPage = new ResultPage(driver);
+		resultPage.returnToHome(driver);
+
+		Assertions.assertTrue(homePage.checkForNote(noteTitle));
+	}
+
+
+	@Test
+	public void createCredTest() throws InterruptedException {
+		String username = "Test.User585";
+		String password = "testpass";
+
+		String credUrl = "newCredTitle";
+		String credUser = "newCredUser";
+		String credPW = "newCredPW";
+
+		loginPage = new LoginPage(driver);
+		loginPage.toLogin(port, driver, wait);
+		loginPage.login(username, password);
+
+		homePage = new HomePage(driver);
+		homePage.toHome(driver);
+		homePage.navCredTab(driver);
+		homePage.navNewCred(driver);
+		homePage.createCred(driver, credUrl, credUser, credPW);
+
+		Assertions.assertTrue(driver.getCurrentUrl().contains("add-credential-result"));
+		Assertions.assertEquals("Result", driver.getTitle());
+
+		resultPage = new ResultPage(driver);
+		resultPage.returnToHome(driver);
+
+		//Does not work for more than one credential for one website
+		Assertions.assertTrue(homePage.checkForCred(credUrl, credUser));
 	}
 
 	@Test
-	@Order(order = 8)
-	public void editNoteTest()
-	{
+	public void editExistingCred() throws InterruptedException {
+		String username = "Test.User585";
+		String password = "testpass";
+
+		String credUrl = "updatedCredUrl";
+		String credUser = "updatedCredUser";
+		String credPW = "updatedCredPW";
+
+		loginPage = new LoginPage(driver);
+		loginPage.toLogin(port, driver, wait);
+		loginPage.login(username, password);
+
+		homePage = new HomePage(driver);
+		homePage.toHome(driver);
+		homePage.navCredTab(driver);
+		homePage.navEditCred(driver);
+		homePage.editCred(driver, credUrl, credUser, credPW);
+
+		Assertions.assertTrue(driver.getCurrentUrl().contains("update-credential-result"));
+		Assertions.assertEquals("Result", driver.getTitle());
+
+		resultPage = new ResultPage(driver);
+		resultPage.returnToHome(driver);
+
+		//Does not work for more than one credential for one website
+		Assertions.assertTrue(homePage.checkForCred(credUrl, credUser));
+	}
+
+
+	@Test
+	public void editNoteTest() throws InterruptedException {
+		String username = "Test.User585";
+		String password = "testpass";
+
 		String newTitle = "UpdatedTitleTest";
 		String newDesc = "UpdatedDescTest";
 
-		createNoteTest();
-		driver.get("http://localhost:" + this.port + "/home");
+		//Login
+		loginPage = new LoginPage(driver);
+		loginPage.toLogin(port, driver, wait);
+		loginPage.login(username, password);
 
-		homePage = new HomePage();
-		homePage.editNote(newTitle, newDesc);
+		homePage = new HomePage(driver);
+
+		createNoteTest();
+
+		driver.get("http://localhost:" + this.port + "/home");
+		homePage = new HomePage(driver);
+		wait.until(ExpectedConditions.elementToBeClickable(homePage.getLogoutButton()));
+		homePage.editNote(driver,newTitle, newDesc);
 
 		Assertions.assertTrue(driver.getCurrentUrl().contains("update-note-result"));
 
 		driver.get("http://localhost:" + this.port + "/home");
-		homePage = new HomePage();
-		homePage.getNotes_tab().click();
+		homePage = new HomePage(driver);
 
 		Assertions.assertEquals(newTitle, homePage.getNoteTitleDisplay().getText());
 		Assertions.assertEquals(newDesc, homePage.getNoteDescriptionDisplay().getText());
 	}
 
 	@Test
-	@Order(order = 9)
-	public void testDeleteNote(){
-		String username = "Test.User";
-		String password = "testpass";
-		String noteTitle = "My note";
-		String noteDescription = "This note is for testing";
+	public void testDeleteNote() throws InterruptedException {
 
-		getLoginPage();
-		loginPage = new LoginPage();
+		String username = "Test.User585";
+		String password = "testpass";
+
+		loginPage = new LoginPage(driver);
+		loginPage.toLogin(port, driver, wait);
 		loginPage.login(username, password);
 
-		homePage = new HomePage();
-		createNoteTest();
+		homePage = new HomePage(driver);
+		homePage.toHome(driver);
 
 
-	//	//Deleting note and verifying that nothing is displayed
-	//	homePage.deleteNote(noteTitle,noteDescription);
-	//	Assertions.assertThrows(NoSuchElementException.class,()-> {
-	//		homePage.getNoteTitle();
-	//	});
+		//getNoteCount() -> 5
+		//Delete (-1)
+		//Verify: getNoteCount() -> 4
+		int noteCount = homePage.getNoteCount();
+		homePage.navNotesTab(driver);
 
-	}
+		homePage.deleteNote(driver);
 
-	public int getNotesSize(HomePage homePage)
-	{
-		int i = 0;
-		for(WebElement temp : homePage.getnotetitledisplaylist())
-			i++;
-		return i;
+		Assertions.assertTrue(driver.getCurrentUrl().contains("delete-credential-result"));
 	}
 }

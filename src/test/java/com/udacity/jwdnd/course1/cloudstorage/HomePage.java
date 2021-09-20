@@ -1,12 +1,155 @@
 package com.udacity.jwdnd.course1.cloudstorage;
 
+import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
+import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.util.List;
 
 public class HomePage {
+
+    public HomePage(WebDriver driver)
+    {
+        PageFactory.initElements(driver, this);
+    }
+
+    public void toHome(WebDriver driver)
+    {
+        new WebDriverWait(driver, 5).until(ExpectedConditions.elementToBeClickable(logoutButton));
+    }
+
+    //region Note-Stuff
+    public void navNotesTab(WebDriver driver) {
+        JavascriptExecutor jse = (JavascriptExecutor) driver;
+        jse.executeScript("arguments[0].click()", notes_tab);
+    }
+
+    //region Note-Create
+    public void navNewNote(WebDriver driver)
+    {
+        new WebDriverWait(driver, 5).until(ExpectedConditions.elementToBeClickable(newNoteButton)).click();
+    }
+
+    public void createNote(WebDriver driver, String newNoteTitle, String newNoteDesc) throws InterruptedException {
+        Thread.sleep(800);
+
+        new WebDriverWait(driver, 5).until(ExpectedConditions.visibilityOf(note_title_input)).sendKeys(newNoteTitle);
+        new WebDriverWait(driver, 5).until(ExpectedConditions.visibilityOf(note_desc_input)).sendKeys(newNoteDesc);
+        newNote_Submit.click();
+    }
+    //endregion
+
+    //region Note-Edit
+    public void editNote(WebDriver driver, String newTitle, String newDesc) throws InterruptedException {
+        Thread.sleep(800);
+
+        new WebDriverWait(driver, 5).until(ExpectedConditions.visibilityOf(note_title_input)).sendKeys(newTitle);
+        new WebDriverWait(driver, 5).until(ExpectedConditions.visibilityOf(note_desc_input)).sendKeys(newDesc);
+        newNote_Submit.click();
+    }
+    //endregion
+
+    public boolean checkForNote(String noteTitleText) {
+        List<WebElement> notesList = notesTable.findElements(By.tagName("th"));
+        boolean created = false;
+        for (WebElement element : notesList) {
+            if (element.getAttribute("innerHTML").equals(noteTitleText)) {
+                created = true;
+                break;
+            }
+        }
+        return created;
+    }
+
+    public int getNoteCount() {
+        List<WebElement> notesList = notesTable.findElements(By.tagName("th"));
+        return notesList.size();
+    }
+
+    public void deleteNote(WebDriver driver) throws InterruptedException {
+        Thread.sleep(800);
+        deleteNoteBtn.click();
+    }
+    //endregion
+
+    //region Credential-Stuff
+    public void navCredTab(WebDriver driver) {
+        JavascriptExecutor jse = (JavascriptExecutor) driver;
+        jse.executeScript("arguments[0].click()", creds_tab);
+    }
+
+    //region Credential-Create
+    public void navNewCred(WebDriver driver) {
+        new WebDriverWait(driver, 5).until(ExpectedConditions.elementToBeClickable(newCredButton)).click();
+    }
+
+    public void createCred(WebDriver driver, String newCredUrl, String newCredUser, String newCredPW) throws InterruptedException {
+        Thread.sleep(800);
+
+        new WebDriverWait(driver, 5).until(ExpectedConditions.visibilityOf(cred_url_input)).sendKeys(newCredUrl);
+        new WebDriverWait(driver, 5).until(ExpectedConditions.visibilityOf(cred_username_input)).sendKeys(newCredUser);
+        new WebDriverWait(driver, 5).until(ExpectedConditions.visibilityOf(cred_password_input)).sendKeys(newCredPW);
+        cred_input_submit.click();
+    }
+    //endregion
+
+    //region Credential-Edit
+    public void navEditCred(WebDriver driver) {
+        new WebDriverWait(driver, 5).until(ExpectedConditions.elementToBeClickable(editCredButton)).click();
+    }
+
+    public void editCred(WebDriver driver, String newCredUrl, String newCredUser, String newCredPW) throws InterruptedException {
+        Thread.sleep(800);
+
+        new WebDriverWait(driver, 5).until(ExpectedConditions.visibilityOf(editCredUrl)).clear();
+        editCredUrl.sendKeys(newCredUrl);
+        new WebDriverWait(driver, 5).until(ExpectedConditions.visibilityOf(editCredUsername)).clear();
+        editCredUsername.sendKeys(newCredUser);
+        new WebDriverWait(driver, 5).until(ExpectedConditions.visibilityOf(editCredPassword)).clear();
+        editCredPassword.sendKeys(newCredPW);
+        editCredSave.click();
+    }
+    //endregion
+
+    public boolean checkForCred(String credUrl, String credUser) {
+        List<WebElement> notesList = credsTable.findElements(By.tagName("th"));
+        boolean created = false;
+        for (WebElement element : notesList) {
+            if (element.getAttribute("innerHTML").equals(credUrl)) {
+                created = true;
+                break;
+            }
+        }
+        return created;
+    }
+    //endregion
+
+    @FindBy(id = "delete-credential")
+    private WebElement deleteNoteBtn;
+
+    @FindBy(id = "credentialEdit-url")
+    private WebElement editCredUrl;
+
+    @FindBy(id = "credentialEdit-username")
+    private WebElement editCredUsername;
+
+    @FindBy(id = "credentialEdit-password")
+    private WebElement editCredPassword;
+
+    @FindBy(id = "save-edit-credential")
+    private WebElement editCredSave;
+
+    @FindBy(id = "userTable")
+    private WebElement notesTable;
+
+    @FindBy(id = "credentialTable")
+    private WebElement credsTable;
 
     @FindBy(id = "logout-button")
     private WebElement logoutButton;
@@ -17,7 +160,6 @@ public class HomePage {
     @FindBy(id = "uploadButton")
     private WebElement uploadButton;
 
-
     @FindBy(id = "file-name")
     private WebElement modal_ShowFile_name;
 
@@ -27,8 +169,6 @@ public class HomePage {
     @FindBy(id = "submit_fileDownload")
     private WebElement modal_ShowFile_downloadButton;
 
-
-
     @FindBy(id = "note-title")
     private WebElement note_title_input;
 
@@ -37,8 +177,6 @@ public class HomePage {
 
     @FindBy(id = "save-note-button")
     private WebElement newNote_Submit;
-
-
 
     @FindBy(id = "credential-url")
     private WebElement cred_url_input;
@@ -52,7 +190,6 @@ public class HomePage {
     @FindBy(id = "credential-submit")
     private WebElement cred_input_submit;
 
-
     @FindBy(id = "credentialEdit-url")
     private WebElement edit_cred_url_input;
 
@@ -65,116 +202,85 @@ public class HomePage {
     @FindBy(id = "save-edit-credential")
     private WebElement edit_cred_input_submit;
 
-
-    public void createNote(String newNoteTitle, String newNoteDesc)
-    {
-        getNotes_tab().click();
-        getNewNoteButton().click();
-
-        getNote_title_input().sendKeys(newNoteTitle);
-        getNote_desc_input().sendKeys(newNoteDesc);
-
-        getNewNote_Submit().click();
-    }
-
-    public void editNote(String newTitle, String newDesc)
-    {
-        getNotes_tab().click();
-        getNote_edit_button().click();
-
-        getEditNote_title().sendKeys(newTitle);
-        getEditNote_description().sendKeys(newDesc);
-
-        getEdit_note_button().click();
-    }
-
-    @FindBy(id = "note-title-display")
-    private List<WebElement> notetitledisplaylist;
-
-    public List<WebElement> getnotetitledisplaylist() {
-        return notetitledisplaylist;
-    }
-
-
     @FindBy(id = "note-title-display")
     private WebElement noteTitleDisplay;
+
+    @FindBy(id = "note-description-display")
+    private WebElement noteDescrDisplay;
+
+    @FindBy(id = "edit-note-button")
+    private WebElement edit_note_button;
+
+    @FindBy(id = "editNote-title")
+    private WebElement editNote_title;
+
+    @FindBy(id = "editNote-description")
+    private WebElement editNote_description;
+
+    @FindBy(id = "note-edit-button")
+    private WebElement note_edit_button;
+
+    @FindBy(id = "nav-files-tab")
+    private WebElement files_tab;
+
+    @FindBy(id = "nav-notes-tab")
+    private WebElement notes_tab;
+
+    @FindBy(id = "open-note-modal")
+    private WebElement newNoteButton;
+
+    @FindBy(id = "nav-credentials-tab")
+    private WebElement creds_tab;
+
+    @FindBy(id = "open-credentials-modal")
+    private WebElement newCredButton;
+
+    @FindBy(id = "open-credentials-edit-modal")
+    private WebElement editCredButton;
 
     public WebElement getNoteTitleDisplay() {
         return noteTitleDisplay;
     }
 
-    @FindBy(id = "note-description-display")
-    private WebElement noteDescrDisplay;
-
-
     public WebElement getNoteDescriptionDisplay(){
         return noteDescrDisplay;
     }
-
-
-    @FindBy(id = "edit-note-button")
-    private WebElement edit_note_button;
 
     public WebElement getEdit_note_button() {
         return edit_note_button;
     }
 
-    @FindBy(id = "editNote-title")
-    private WebElement editNote_title;
-
     public WebElement getEditNote_title() {
         return editNote_title;
     }
-
-    @FindBy(id = "editNote-description")
-    private WebElement editNote_description;
 
     public WebElement getEditNote_description() {
         return editNote_description;
     }
 
-    @FindBy(id = "note-edit-button")
-    private WebElement note_edit_button;
-
     public WebElement getNote_edit_button() {
         return note_edit_button;
     }
-
-    @FindBy(id = "nav-files-tab")
-    private WebElement files_tab;
 
     public WebElement getFiles_tab() {
         return files_tab;
     }
 
-    @FindBy(id = "nav-notes-tab")
-    private WebElement notes_tab;
-
     public WebElement getNotes_tab() {
         return notes_tab;
     }
-
-    @FindBy(id = "open-note-modal")
-    private WebElement newNoteButton;
 
     public WebElement getNewNoteButton() {
         return newNoteButton;
     }
 
-    @FindBy(id = "nav-credentials-tab")
-    private WebElement creds_tab;
-
     public WebElement getCreds_tab() {
         return creds_tab;
     }
 
-    @FindBy(id = "open-credentials-modal")
-    private WebElement newCredButton;
-
     public WebElement getNewCredButton() {
         return newCredButton;
     }
-
 
     public WebElement getLogoutButton() {
         return logoutButton;
