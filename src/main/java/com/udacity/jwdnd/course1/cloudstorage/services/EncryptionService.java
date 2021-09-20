@@ -46,7 +46,6 @@ public class EncryptionService {
                 | InvalidKeyException | IllegalBlockSizeException | BadPaddingException e) {
             logger.error(e.getMessage());
         }
-
         return new String(decryptedValue);
     }
 
