@@ -112,7 +112,7 @@ class CloudStorageApplicationTests {
 	@Test
 	public void logoutTest()
 	{
-		String username = "Test.User585";
+		String username = "Test.User71";
 		String password = "testpass";
 
 		loginPage = new LoginPage(driver);
@@ -135,7 +135,7 @@ class CloudStorageApplicationTests {
 		String firstname = "Testname";
 		String lastname = "TestLastname";
 
-		String username = "Test.User585";
+		String username = "Test.User71";
 		String password = "testpass";
 
 		signUpPage = new SignUpPage(driver);
@@ -148,7 +148,7 @@ class CloudStorageApplicationTests {
 
 	@Test
 	public void createNoteTest() throws InterruptedException {
-		String username = "Test.User585";
+		String username = "Test.User71";
 		String password = "testpass";
 
 		String noteTitle = "newTitle";
@@ -176,7 +176,7 @@ class CloudStorageApplicationTests {
 
 	@Test
 	public void createCredTest() throws InterruptedException {
-		String username = "Test.User585";
+		String username = "Test.User71";
 		String password = "testpass";
 
 		String credUrl = "newCredTitle";
@@ -205,7 +205,7 @@ class CloudStorageApplicationTests {
 
 	@Test
 	public void editExistingCred() throws InterruptedException {
-		String username = "Test.User585";
+		String username = "Test.User71";
 		String password = "testpass";
 
 		String credUrl = "updatedCredUrl";
@@ -235,7 +235,7 @@ class CloudStorageApplicationTests {
 
 	@Test
 	public void editNoteTest() throws InterruptedException {
-		String username = "Test.User585";
+		String username = "Test.User71";
 		String password = "testpass";
 
 		String newTitle = "UpdatedTitleTest";
@@ -267,7 +267,7 @@ class CloudStorageApplicationTests {
 	@Test
 	public void testDeleteNote() throws InterruptedException {
 
-		String username = "Test.User585";
+		String username = "Test.User71";
 		String password = "testpass";
 
 		loginPage = new LoginPage(driver);
