@@ -15,6 +15,8 @@ public interface CredentialMapper {
     List<Credential> getCredentialByUserid(Integer userid);
     @Select("SELECT * FROM CREDENTIALS")
     List<Credential> getCredentials();
+    @Select("SELECT Max(credentialid) FROM CREDENTIALS")
+    int getMaxID();
 
     @Insert("INSERT INTO CREDENTIALS (url, username, key, password, userid) VALUES (#{url}, #{username}, #{key}, #{password}, #{userid})")
     @Options(keyProperty = "credentialid", useGeneratedKeys = true)

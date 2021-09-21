@@ -56,7 +56,6 @@ public class NoteService {
         Integer userById = userMapper.getUser(userid).getUserid();
         Integer noteById = noteMapper.getNoteByID(noteid).getNoteid();
         if(userById.equals(noteMapper.getNoteByID(noteid).getUserid())){
-            System.out.println("userById : " + userById);
             noteMapper.deleteNote(noteById);
         } else{
             throw new RuntimeException("There was an error while processing this request...");

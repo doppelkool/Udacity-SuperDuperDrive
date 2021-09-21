@@ -39,8 +39,16 @@ public class CredentialService {
         credentialMapper.insertCred(credential);
     }
 
+    public int getMaxIDFromCred() {
+        return credentialMapper.getMaxID();
+    }
+
     public List<Credential> getCredentialsByUser(User user) {
         return credentialMapper.getCredentialByUserid(user.getUserid());
+    }
+
+    public Credential getCredentialByID(Integer id) {
+        return credentialMapper.getCredByid(id);
     }
 
     public List<Credential> getAllCredentials(Authentication authentication){

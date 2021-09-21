@@ -1,5 +1,7 @@
 package com.udacity.jwdnd.course1.cloudstorage;
 
+import com.udacity.jwdnd.course1.cloudstorage.model.Credential;
+import com.udacity.jwdnd.course1.cloudstorage.services.CredentialService;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
@@ -11,6 +13,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 public class HomePage {
 
@@ -46,12 +49,18 @@ public class HomePage {
     //endregion
 
     //region Note-Edit
+    public void navEditNote(WebDriver driver) {
+        new WebDriverWait(driver, 5).until(ExpectedConditions.elementToBeClickable(note_edit_button)).click();
+    }
+
     public void editNote(WebDriver driver, String newTitle, String newDesc) throws InterruptedException {
         Thread.sleep(800);
 
-        new WebDriverWait(driver, 5).until(ExpectedConditions.visibilityOf(note_title_input)).sendKeys(newTitle);
-        new WebDriverWait(driver, 5).until(ExpectedConditions.visibilityOf(note_desc_input)).sendKeys(newDesc);
-        newNote_Submit.click();
+        new WebDriverWait(driver, 5).until(ExpectedConditions.visibilityOf(editNote_title)).clear();
+        editNote_title.sendKeys(newTitle);
+        new WebDriverWait(driver, 5).until(ExpectedConditions.visibilityOf(editNote_description)).clear();
+        editNote_description.sendKeys(newDesc);
+        edit_note_button.click();
     }
     //endregion
 
@@ -74,7 +83,8 @@ public class HomePage {
 
     public void deleteNote(WebDriver driver) throws InterruptedException {
         Thread.sleep(800);
-        deleteNoteBtn.click();
+
+        new WebDriverWait(driver, 5).until(ExpectedConditions.visibilityOf(note_delete_button)).click();
     }
     //endregion
 
@@ -100,6 +110,10 @@ public class HomePage {
     //endregion
 
     //region Credential-Edit
+    public String getCredPW() {
+        return cred_password_input.getText();
+    }
+
     public void navEditCred(WebDriver driver) {
         new WebDriverWait(driver, 5).until(ExpectedConditions.elementToBeClickable(editCredButton)).click();
     }
@@ -127,6 +141,53 @@ public class HomePage {
             }
         }
         return created;
+    }
+
+    public int getCredCount() {
+        List<WebElement> credList = credsTable.findElements(By.tagName("th"));
+        return credList.size();
+    }
+    public void deleteCred(WebDriver driver) throws InterruptedException {
+        Thread.sleep(800);
+
+        new WebDriverWait(driver, 5).until(ExpectedConditions.visibilityOf(deleteNoteBtn)).click();
+    }
+    public boolean checkForCredentialEncryptedPassword(String url, String username, CredentialService credentialService)
+    {
+        return getCredentialTableRowAlternative(url, username, credentialService) != null;
+    }
+    private WebElement getCredentialTableRowAlternative(String url, String username, CredentialService credentialService) {
+        WebElement cerdentialRow = null;
+        try {
+            WebElement body = credsTable.findElement(By.tagName("tbody"));
+            if (body != null) {
+                List<WebElement> rows = body.findElements(By.tagName("tr"));
+                if (rows != null && !rows.isEmpty()) {
+                    int x = -1;
+                    for (int i = 0; i < credentialService.getMaxIDFromCred(); i++) {
+                        x++;
+                        Credential credential = credentialService.getCredentialByID(i+1);
+                        if(credential == null) continue;
+
+                        WebElement row = rows.get(x);
+                        WebElement textCredentialUrl = row.findElement(By.id("credential-table-url"));
+                        WebElement textCredentialUsername = row.findElement(By.id("credential-table-username"));
+                        WebElement textCredentialPassword = row.findElement(By.id("credential-table-password"));
+                        System.out.println("CREDENTIAL ENCRYPTED PASSWORD: " + credential.getPassword());
+                        System.out.println("CREDENTIAL ENCRYPTED PASSWORD TABLE: " + textCredentialPassword.getAttribute("innerHTML"));
+                        if (textCredentialUrl.getAttribute("innerHTML").equals(url) &&
+                                textCredentialUsername.getAttribute("innerHTML").equals(username) &&
+                                textCredentialPassword.getAttribute("innerHTML").equals(credential.getPassword())) {
+                            cerdentialRow = row;
+                            break;
+                        }
+                    }
+                }
+            }
+        } catch (NoSuchElementException e) {
+            // log as INFO?
+        }
+        return cerdentialRow;
     }
     //endregion
 
@@ -219,6 +280,9 @@ public class HomePage {
 
     @FindBy(id = "note-edit-button")
     private WebElement note_edit_button;
+
+    @FindBy(id = "note-delete-button")
+    private WebElement note_delete_button;
 
     @FindBy(id = "nav-files-tab")
     private WebElement files_tab;
