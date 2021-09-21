@@ -64,6 +64,12 @@ public class HomePage {
     }
     //endregion
 
+    public void deleteNote(WebDriver driver) throws InterruptedException {
+        Thread.sleep(800);
+
+        new WebDriverWait(driver, 5).until(ExpectedConditions.visibilityOf(note_delete_button)).click();
+    }
+
     public boolean checkForNote(String noteTitleText) {
         List<WebElement> notesList = notesTable.findElements(By.tagName("th"));
         boolean created = false;
@@ -79,12 +85,6 @@ public class HomePage {
     public int getNoteCount() {
         List<WebElement> notesList = notesTable.findElements(By.tagName("th"));
         return notesList.size();
-    }
-
-    public void deleteNote(WebDriver driver) throws InterruptedException {
-        Thread.sleep(800);
-
-        new WebDriverWait(driver, 5).until(ExpectedConditions.visibilityOf(note_delete_button)).click();
     }
     //endregion
 
@@ -131,6 +131,12 @@ public class HomePage {
     }
     //endregion
 
+    public void deleteCred(WebDriver driver) throws InterruptedException {
+        Thread.sleep(800);
+
+        new WebDriverWait(driver, 5).until(ExpectedConditions.visibilityOf(deleteNoteBtn)).click();
+    }
+
     public boolean checkForCred(String credUrl, String credUser) {
         List<WebElement> notesList = credsTable.findElements(By.tagName("th"));
         boolean created = false;
@@ -147,15 +153,11 @@ public class HomePage {
         List<WebElement> credList = credsTable.findElements(By.tagName("th"));
         return credList.size();
     }
-    public void deleteCred(WebDriver driver) throws InterruptedException {
-        Thread.sleep(800);
 
-        new WebDriverWait(driver, 5).until(ExpectedConditions.visibilityOf(deleteNoteBtn)).click();
-    }
-    public boolean checkForCredentialEncryptedPassword(String url, String username, CredentialService credentialService)
-    {
+    public boolean checkForCredentialEncryptedPassword(String url, String username, CredentialService credentialService) {
         return getCredentialTableRowAlternative(url, username, credentialService) != null;
     }
+
     private WebElement getCredentialTableRowAlternative(String url, String username, CredentialService credentialService) {
         WebElement cerdentialRow = null;
         try {
@@ -191,44 +193,27 @@ public class HomePage {
     }
     //endregion
 
-    @FindBy(id = "delete-credential")
-    private WebElement deleteNoteBtn;
 
-    @FindBy(id = "credentialEdit-url")
-    private WebElement editCredUrl;
-
-    @FindBy(id = "credentialEdit-username")
-    private WebElement editCredUsername;
-
-    @FindBy(id = "credentialEdit-password")
-    private WebElement editCredPassword;
-
-    @FindBy(id = "save-edit-credential")
-    private WebElement editCredSave;
-
-    @FindBy(id = "userTable")
-    private WebElement notesTable;
-
-    @FindBy(id = "credentialTable")
-    private WebElement credsTable;
 
     @FindBy(id = "logout-button")
     private WebElement logoutButton;
 
-    @FindBy(id = "fileUpload")
-    private WebElement fileUpload;
+    @FindBy(id = "credentialEdit-password")
+    private WebElement edit_cred_password_input;
 
-    @FindBy(id = "uploadButton")
-    private WebElement uploadButton;
+    public WebElement getLogoutButton() {
+        return logoutButton;
+    }
 
-    @FindBy(id = "file-name")
-    private WebElement modal_ShowFile_name;
+    public WebElement getEdit_cred_password_input() {
+        return edit_cred_password_input;
+    }
 
-    @FindBy(id = "file-size")
-    private WebElement modal_ShowFile_size;
+    @FindBy(id = "nav-notes-tab")
+    private WebElement notes_tab;
 
-    @FindBy(id = "submit_fileDownload")
-    private WebElement modal_ShowFile_downloadButton;
+    @FindBy(id = "open-note-modal")
+    private WebElement newNoteButton;
 
     @FindBy(id = "note-title")
     private WebElement note_title_input;
@@ -238,6 +223,33 @@ public class HomePage {
 
     @FindBy(id = "save-note-button")
     private WebElement newNote_Submit;
+
+    @FindBy(id = "note-edit-button")
+    private WebElement note_edit_button;
+
+    @FindBy(id = "editNote-title")
+    private WebElement editNote_title;
+
+    @FindBy(id = "editNote-description")
+    private WebElement editNote_description;
+
+    @FindBy(id = "edit-note-button")
+    private WebElement edit_note_button;
+
+    @FindBy(id = "note-delete-button")
+    private WebElement note_delete_button;
+
+    @FindBy(id = "userTable")
+    private WebElement notesTable;
+
+    @FindBy(id = "credentialTable")
+    private WebElement credsTable;
+
+    @FindBy(id = "nav-credentials-tab")
+    private WebElement creds_tab;
+
+    @FindBy(id = "open-credentials-modal")
+    private WebElement newCredButton;
 
     @FindBy(id = "credential-url")
     private WebElement cred_url_input;
@@ -251,166 +263,21 @@ public class HomePage {
     @FindBy(id = "credential-submit")
     private WebElement cred_input_submit;
 
-    @FindBy(id = "credentialEdit-url")
-    private WebElement edit_cred_url_input;
-
-    @FindBy(id = "credentialEdit-username")
-    private WebElement edit_cred_username_input;
-
-    @FindBy(id = "credentialEdit-password")
-    private WebElement edit_cred_password_input;
-
-    @FindBy(id = "save-edit-credential")
-    private WebElement edit_cred_input_submit;
-
-    @FindBy(id = "note-title-display")
-    private WebElement noteTitleDisplay;
-
-    @FindBy(id = "note-description-display")
-    private WebElement noteDescrDisplay;
-
-    @FindBy(id = "edit-note-button")
-    private WebElement edit_note_button;
-
-    @FindBy(id = "editNote-title")
-    private WebElement editNote_title;
-
-    @FindBy(id = "editNote-description")
-    private WebElement editNote_description;
-
-    @FindBy(id = "note-edit-button")
-    private WebElement note_edit_button;
-
-    @FindBy(id = "note-delete-button")
-    private WebElement note_delete_button;
-
-    @FindBy(id = "nav-files-tab")
-    private WebElement files_tab;
-
-    @FindBy(id = "nav-notes-tab")
-    private WebElement notes_tab;
-
-    @FindBy(id = "open-note-modal")
-    private WebElement newNoteButton;
-
-    @FindBy(id = "nav-credentials-tab")
-    private WebElement creds_tab;
-
-    @FindBy(id = "open-credentials-modal")
-    private WebElement newCredButton;
-
     @FindBy(id = "open-credentials-edit-modal")
     private WebElement editCredButton;
 
-    public WebElement getNoteTitleDisplay() {
-        return noteTitleDisplay;
-    }
+    @FindBy(id = "credentialEdit-url")
+    private WebElement editCredUrl;
 
-    public WebElement getNoteDescriptionDisplay(){
-        return noteDescrDisplay;
-    }
+    @FindBy(id = "credentialEdit-username")
+    private WebElement editCredUsername;
 
-    public WebElement getEdit_note_button() {
-        return edit_note_button;
-    }
+    @FindBy(id = "credentialEdit-password")
+    private WebElement editCredPassword;
 
-    public WebElement getEditNote_title() {
-        return editNote_title;
-    }
+    @FindBy(id = "save-edit-credential")
+    private WebElement editCredSave;
 
-    public WebElement getEditNote_description() {
-        return editNote_description;
-    }
-
-    public WebElement getNote_edit_button() {
-        return note_edit_button;
-    }
-
-    public WebElement getFiles_tab() {
-        return files_tab;
-    }
-
-    public WebElement getNotes_tab() {
-        return notes_tab;
-    }
-
-    public WebElement getNewNoteButton() {
-        return newNoteButton;
-    }
-
-    public WebElement getCreds_tab() {
-        return creds_tab;
-    }
-
-    public WebElement getNewCredButton() {
-        return newCredButton;
-    }
-
-    public WebElement getLogoutButton() {
-        return logoutButton;
-    }
-
-    public WebElement getFileUpload() {
-        return fileUpload;
-    }
-
-    public WebElement getUploadButton() {
-        return uploadButton;
-    }
-
-    public WebElement getModal_ShowFile_name() {
-        return modal_ShowFile_name;
-    }
-
-    public WebElement getModal_ShowFile_size() {
-        return modal_ShowFile_size;
-    }
-
-    public WebElement getModal_ShowFile_downloadButton() {
-        return modal_ShowFile_downloadButton;
-    }
-
-    public WebElement getNote_title_input() {
-        return note_title_input;
-    }
-
-    public WebElement getNote_desc_input() {
-        return note_desc_input;
-    }
-
-    public WebElement getNewNote_Submit() {
-        return newNote_Submit;
-    }
-
-    public WebElement getCred_url_input() {
-        return cred_url_input;
-    }
-
-    public WebElement getCred_username_input() {
-        return cred_username_input;
-    }
-
-    public WebElement getCred_password_input() {
-        return cred_password_input;
-    }
-
-    public WebElement getCred_input_submit() {
-        return cred_input_submit;
-    }
-
-    public WebElement getEdit_cred_url_input() {
-        return edit_cred_url_input;
-    }
-
-    public WebElement getEdit_cred_username_input() {
-        return edit_cred_username_input;
-    }
-
-    public WebElement getEdit_cred_password_input() {
-        return edit_cred_password_input;
-    }
-
-    public WebElement getEdit_cred_input_submit() {
-        return edit_cred_input_submit;
-    }
+    @FindBy(id = "delete-credential")
+    private WebElement deleteNoteBtn;
 }
