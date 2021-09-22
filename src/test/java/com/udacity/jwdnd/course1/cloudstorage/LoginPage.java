@@ -8,7 +8,6 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class LoginPage {
-
     @FindBy(id = "inputUsername")
     private WebElement loginUsername;
 
@@ -32,8 +31,6 @@ public class LoginPage {
 
         WebElement tempUsername = this.getLoginUsername();
         wait.until(ExpectedConditions.elementToBeClickable(tempUsername));
-        //WebElement tempPass = loginPage.getLoginPassword();
-        //wait.until(ExpectedConditions.elementToBeClickable(tempPass));
     }
 
     public void login(String username, String password)
@@ -43,7 +40,6 @@ public class LoginPage {
 
         loginButton.click();
     }
-
 
     public WebElement getLoginUsername() {
         return loginUsername;

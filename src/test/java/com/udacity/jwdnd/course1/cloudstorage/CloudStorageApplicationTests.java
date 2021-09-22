@@ -1,13 +1,10 @@
 package com.udacity.jwdnd.course1.cloudstorage;
 
-import com.udacity.jwdnd.course1.cloudstorage.mapper.UserMapper;
 import com.udacity.jwdnd.course1.cloudstorage.model.Credential;
 import com.udacity.jwdnd.course1.cloudstorage.services.CredentialService;
 import com.udacity.jwdnd.course1.cloudstorage.services.EncryptionService;
-import com.udacity.jwdnd.course1.cloudstorage.services.UserService;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.junit.jupiter.api.*;
-import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
@@ -19,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 
-import javax.validation.constraints.AssertTrue;
 import java.util.Random;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -182,7 +178,7 @@ class CloudStorageApplicationTests {
 		Assertions.assertTrue(driver.getCurrentUrl().contains("add-note-result"));
 
 		resultPage = new ResultPage(driver);
-		resultPage.returnToHome(driver);
+		resultPage.returnToHome(wait);
 
 		Assertions.assertTrue(homePage.checkForNote(noteTitle));
 	}
@@ -214,7 +210,7 @@ class CloudStorageApplicationTests {
 		Assertions.assertTrue(driver.getCurrentUrl().contains("update-note-result"));
 
 		resultPage = new ResultPage(driver);
-		resultPage.returnToHome(driver);
+		resultPage.returnToHome(wait);
 
 		Assertions.assertTrue(homePage.checkForNote(newTitle));
 	}
@@ -244,7 +240,7 @@ class CloudStorageApplicationTests {
 		Assertions.assertTrue(driver.getCurrentUrl().contains("delete-note-result"));
 
 		resultPage = new ResultPage(driver);
-		resultPage.returnToHome(driver);
+		resultPage.returnToHome(wait);
 
 		new HomePage(driver).toHome(driver);
 
@@ -261,9 +257,9 @@ class CloudStorageApplicationTests {
 		String username = "Test.User883";
 		String password = "testpass";
 
-		String credUrl = "newCredTitle";
-		String credUser = "newCredUser";
-		String credPW = "newCredPW";
+		String credUrl = "newCredTitle" + new Random().nextInt(200);
+		String credUser = "newCredUser" + new Random().nextInt(200);
+		String credPW = "newCredPW" + new Random().nextInt(200);
 
 		loginPage = new LoginPage(driver);
 		loginPage.toLogin(port, driver, wait);
@@ -279,9 +275,15 @@ class CloudStorageApplicationTests {
 		Assertions.assertEquals("Result", driver.getTitle());
 
 		resultPage = new ResultPage(driver);
-		resultPage.returnToHome(driver);
+		resultPage.returnToHome(wait);
 
-		Assertions.assertTrue(homePage.checkForCredentialEncryptedPassword(credUrl, credUser, credentialService));
+		homePage.toHome(driver);
+		homePage.navCredTab(driver);
+		wait.until(ExpectedConditions.elementToBeClickable(homePage.getNewCredButton()));
+
+		String key = credentialService.getCredentialByID(credentialService.getMaxIDFromCred()).getKey();
+		credPW = encryptionService.encryptValue(credPW, key);
+		Assertions.assertTrue(homePage.checkForCredentialEncryptedPassword(credUrl, credUser, credPW, credentialService));
 	}
 
 	/**
@@ -323,7 +325,7 @@ class CloudStorageApplicationTests {
 		Assertions.assertEquals("Result", driver.getTitle());
 
 		resultPage = new ResultPage(driver);
-		resultPage.returnToHome(driver);
+		resultPage.returnToHome(wait);
 
 		//Does not work for more than one credential for one website
 		Assertions.assertTrue(homePage.checkForCred(credUrl, credUser));
@@ -355,7 +357,7 @@ class CloudStorageApplicationTests {
 		Assertions.assertTrue(driver.getCurrentUrl().contains("delete-credential-result"));
 
 		resultPage = new ResultPage(driver);
-		resultPage.returnToHome(driver);
+		resultPage.returnToHome(wait);
 
 		new HomePage(driver).toHome(driver);
 

@@ -7,11 +7,11 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -154,46 +154,67 @@ public class HomePage {
         return credList.size();
     }
 
-    public boolean checkForCredentialEncryptedPassword(String url, String username, CredentialService credentialService) {
-        return getCredentialTableRowAlternative(url, username, credentialService) != null;
+    public boolean checkForCredentialEncryptedPassword(String url, String username, String pw, CredentialService credentialService) {
+        return alternative(url, username, pw, credentialService) != null;
     }
 
-    private WebElement getCredentialTableRowAlternative(String url, String username, CredentialService credentialService) {
-        WebElement cerdentialRow = null;
-        try {
-            WebElement body = credsTable.findElement(By.tagName("tbody"));
-            if (body != null) {
-                List<WebElement> rows = body.findElements(By.tagName("tr"));
-                if (rows != null && !rows.isEmpty()) {
-                    int x = -1;
-                    for (int i = 0; i < credentialService.getMaxIDFromCred(); i++) {
-                        x++;
-                        Credential credential = credentialService.getCredentialByID(i+1);
-                        if(credential == null) continue;
-
-                        WebElement row = rows.get(x);
-                        WebElement textCredentialUrl = row.findElement(By.id("credential-table-url"));
-                        WebElement textCredentialUsername = row.findElement(By.id("credential-table-username"));
-                        WebElement textCredentialPassword = row.findElement(By.id("credential-table-password"));
-                        System.out.println("CREDENTIAL ENCRYPTED PASSWORD: " + credential.getPassword());
-                        System.out.println("CREDENTIAL ENCRYPTED PASSWORD TABLE: " + textCredentialPassword.getAttribute("innerHTML"));
-                        if (textCredentialUrl.getAttribute("innerHTML").equals(url) &&
-                                textCredentialUsername.getAttribute("innerHTML").equals(username) &&
-                                textCredentialPassword.getAttribute("innerHTML").equals(credential.getPassword())) {
-                            cerdentialRow = row;
-                            break;
-                        }
-                    }
-                }
-            }
-        } catch (NoSuchElementException e) {
-            // log as INFO?
+    public WebElement alternative(String url, String user, String pw, CredentialService credentialService)
+    {
+        WebElement body = credsTable.findElement(By.tagName("tbody"));
+        if (body == null) {
+            return null;
         }
-        return cerdentialRow;
+
+        List<WebElement> rows = body.findElements(By.tagName("tr"));
+        if (rows == null || rows.isEmpty()) {
+            return null;
+        }
+
+        for (int i = 0; i < rows.size(); i++) {
+            Credential temp_on_row = new Credential(url, user);
+
+            Credential credential = credentialService.getCredentialByID(i+1);
+            Credential temp = null;
+            if(credential == null)
+            {
+                for(int x = 0; x < credentialService.getMaxIDFromCred(); x++)
+                {
+                    temp = credentialService.getCredentialByID(x+1);
+                    if(temp == null) continue;
+                    if(!resolved(temp)) continue;
+                }
+                if(temp == null) continue;
+                credential = temp;
+            }
+            String credurl = credential.getUrl();
+            String credUser = credential.getUsername();
+            String credPW = credential.getPassword();
+
+            String tempUrl = temp_on_row.getUrl();
+            String tempUsername = temp_on_row.getUsername();
+            String tempPW = pw;
+
+            System.out.println(i + " -> unbekannt");
+            System.out.println(credurl + " -> " + tempUrl);
+            System.out.println(credUser + " -> " + tempUsername);
+            System.out.println(credPW + " -> " + tempPW);
+
+            if(!credential.getUrl().equalsIgnoreCase(temp_on_row.getUrl())) continue;
+            if(!credential.getUsername().equalsIgnoreCase(temp_on_row.getUsername())) continue;
+            if(!credential.getPassword().equalsIgnoreCase(tempPW)) continue;
+            return rows.get(i);
+        }
+        return null;
+    }
+
+    List<Credential> resolved = new ArrayList<>();
+    public boolean resolved(Credential a)
+    {
+        if(resolved.contains(a)) return false;
+        resolved.add(a);
+        return true;
     }
     //endregion
-
-
 
     @FindBy(id = "logout-button")
     private WebElement logoutButton;
@@ -250,6 +271,10 @@ public class HomePage {
 
     @FindBy(id = "open-credentials-modal")
     private WebElement newCredButton;
+
+    public WebElement getNewCredButton() {
+        return newCredButton;
+    }
 
     @FindBy(id = "credential-url")
     private WebElement cred_url_input;

@@ -25,9 +25,6 @@ public class SignUpPage {
     @FindBy(id = "submit-signup-button")
     private WebElement signUpButton;
 
-    @FindBy(id = "signUpError")
-    private WebElement signUpError;
-
     public SignUpPage(WebDriver driver)
     {
         PageFactory.initElements(driver, this);
@@ -46,29 +43,5 @@ public class SignUpPage {
         signupUsername.sendKeys(username);
         signupPassword.sendKeys(password);
         signUpButton.click();
-    }
-
-    public WebElement getSignupFirstName() {
-        return signupFirstName;
-    }
-
-    public WebElement getSignupLastName() {
-        return signupLastName;
-    }
-
-    public WebElement getSignupUsername() {
-        return signupUsername;
-    }
-
-    public WebElement getSignupPassword() {
-        return signupPassword;
-    }
-
-    public WebElement getSignUpButton() {
-        return signUpButton;
-    }
-
-    public WebElement getSignUpError() {
-        return signUpError;
     }
 }

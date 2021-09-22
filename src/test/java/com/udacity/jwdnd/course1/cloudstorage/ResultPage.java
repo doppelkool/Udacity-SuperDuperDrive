@@ -20,8 +20,8 @@ public class ResultPage {
         PageFactory.initElements(driver, this);
     }
 
-    public void returnToHome(WebDriver driver)
+    public void returnToHome(WebDriverWait wait)
     {
-        new WebDriverWait(driver, 5).until(ExpectedConditions.elementToBeClickable(returnToHome)).click();
+        wait.until(ExpectedConditions.elementToBeClickable(returnToHome)).click();
     }
 }
