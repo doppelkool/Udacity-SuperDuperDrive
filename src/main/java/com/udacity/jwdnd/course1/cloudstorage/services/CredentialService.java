@@ -69,11 +69,6 @@ public class CredentialService {
         }
     }
 
-   // public void updateCredential(String newUrl, String newUsername, String newPassword, Integer credentialId){
-   //     String password = encryptionService.encryptValue(newPassword, encryptionService.getSalt());
-   //     int updatedCredential = credentialMapper.updateCredential(newUrl,newUsername,password, credentialId);
-   //     System.out.println("Updated " + updatedCredential + " credentials");
-   // }
     public void updateCredential(String newUrl, String newUsername, String newPassword, Integer credentialId){
         Credential credential = credentialMapper.getCredByid(credentialId);
         String password = encryptionService.encryptValue(newPassword,credential.getKey());

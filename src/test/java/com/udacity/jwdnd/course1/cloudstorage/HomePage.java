@@ -13,7 +13,6 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 public class HomePage {
 
@@ -155,10 +154,10 @@ public class HomePage {
     }
 
     public boolean checkForCredentialEncryptedPassword(String url, String username, String pw, CredentialService credentialService) {
-        return alternative(url, username, pw, credentialService) != null;
+        return new_CheckCredentialIsDisplayed(url, username, pw, credentialService) != null;
     }
 
-    public WebElement alternative(String url, String user, String pw, CredentialService credentialService)
+    public WebElement new_CheckCredentialIsDisplayed(String url, String user, String pw, CredentialService credentialService)
     {
         WebElement body = credsTable.findElement(By.tagName("tbody"));
         if (body == null) {
@@ -174,45 +173,34 @@ public class HomePage {
             Credential temp_on_row = new Credential(url, user);
 
             Credential credential = credentialService.getCredentialByID(i+1);
-            Credential temp = null;
             if(credential == null)
             {
+                Credential temp = null;
                 for(int x = 0; x < credentialService.getMaxIDFromCred(); x++)
                 {
                     temp = credentialService.getCredentialByID(x+1);
                     if(temp == null) continue;
-                    if(!resolved(temp)) continue;
+                    if(!wasAlreadyChecked(temp)) break;
                 }
                 if(temp == null) continue;
                 credential = temp;
             }
-            String credurl = credential.getUrl();
-            String credUser = credential.getUsername();
-            String credPW = credential.getPassword();
-
-            String tempUrl = temp_on_row.getUrl();
-            String tempUsername = temp_on_row.getUsername();
-            String tempPW = pw;
-
-            System.out.println(i + " -> unbekannt");
-            System.out.println(credurl + " -> " + tempUrl);
-            System.out.println(credUser + " -> " + tempUsername);
-            System.out.println(credPW + " -> " + tempPW);
 
             if(!credential.getUrl().equalsIgnoreCase(temp_on_row.getUrl())) continue;
             if(!credential.getUsername().equalsIgnoreCase(temp_on_row.getUsername())) continue;
-            if(!credential.getPassword().equalsIgnoreCase(tempPW)) continue;
+            if(!credential.getPassword().equalsIgnoreCase(pw)) continue;
+            resolved.clear();
             return rows.get(i);
         }
         return null;
     }
 
     List<Credential> resolved = new ArrayList<>();
-    public boolean resolved(Credential a)
+    public boolean wasAlreadyChecked(Credential a)
     {
-        if(resolved.contains(a)) return false;
+        if(resolved.contains(a)) return true;
         resolved.add(a);
-        return true;
+        return false;
     }
     //endregion
 

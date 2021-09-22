@@ -282,8 +282,7 @@ class CloudStorageApplicationTests {
 		wait.until(ExpectedConditions.elementToBeClickable(homePage.getNewCredButton()));
 
 		String key = credentialService.getCredentialByID(credentialService.getMaxIDFromCred()).getKey();
-		credPW = encryptionService.encryptValue(credPW, key);
-		Assertions.assertTrue(homePage.checkForCredentialEncryptedPassword(credUrl, credUser, credPW, credentialService));
+		Assertions.assertTrue(homePage.checkForCredentialEncryptedPassword(credUrl, credUser, encryptionService.encryptValue(credPW, key), credentialService));
 	}
 
 	/**
