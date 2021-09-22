@@ -198,7 +198,16 @@ public class HomePage {
     List<Credential> resolved = new ArrayList<>();
     public boolean wasAlreadyChecked(Credential a)
     {
-        if(resolved.contains(a)) return true;
+        for(int i = 0; i < resolved.size(); i++)
+        {
+            Credential t = resolved.get(i);
+            if(t.getUsername().equals(a.getUsername())
+                    && t.getUrl().equalsIgnoreCase(a.getUrl())
+                    && t.getPassword().equalsIgnoreCase(a.getPassword()))
+            {
+                return true;
+            }
+        }
         resolved.add(a);
         return false;
     }

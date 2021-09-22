@@ -261,6 +261,10 @@ class CloudStorageApplicationTests {
 		String credUser = "newCredUser" + new Random().nextInt(200);
 		String credPW = "newCredPW" + new Random().nextInt(200);
 
+		System.out.println("URL: " + credUrl);
+		System.out.println("User: " + credUser);
+		System.out.println("PW: " + credPW);
+
 		loginPage = new LoginPage(driver);
 		loginPage.toLogin(port, driver, wait);
 		loginPage.login(username, password);
