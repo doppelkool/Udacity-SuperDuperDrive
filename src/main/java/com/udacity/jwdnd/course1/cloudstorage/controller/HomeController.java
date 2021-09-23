@@ -196,13 +196,17 @@ public class HomeController {
 
         String uploadError = null;
         successNote = "File has been successfully uploaded.";
+        System.out.println("Size: " + FileForm.getFileUpload().getSize());
         if(fileService.fileAlreadyExists(FileForm.getFileUpload().getOriginalFilename())){
             uploadError = "File with this name already exists.";
             model.addAttribute("uploadError", uploadError);
-        } else if(FileForm.getFileUpload().getSize() == 0){
+        } else if(FileForm.getFileUpload().getSize() == 0) {
             uploadError = "Please select file to upload.";
             model.addAttribute("uploadError", uploadError);
-        } else{
+        } else if ((FileForm.getFileUpload().getSize() / 1000) >= 100) {
+            uploadError = "Files are not allowed above a size of 100MB.";
+            model.addAttribute("uploadError", uploadError);
+        } else {
             model.addAttribute("successNote", successNote);
             fileService.addFile(FileForm, authentication);
         }
